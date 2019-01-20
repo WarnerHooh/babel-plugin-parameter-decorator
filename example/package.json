@@ -2,14 +2,9 @@
   "name": "babel-plugin-parameter-decorator",
   "version": "1.0.0",
   "description": "Function parameter decorator transform plugin for babel v7, just like typescript.",
-  "main": "lib",
-  "engine": {
-    "node": "*"
-  },
+  "main": "index.js",
   "scripts": {
-    "build": "babel index.js -d lib",
-    "postinstall": "npm run build",
-    "prepublish": "npm run build"
+    "build": "webpack --mode development"
   },
   "repository": {
     "type": "git",
@@ -26,12 +21,11 @@
     "typescript"
   ],
   "devDependencies": {
-    "@babel/cli": "^7.0.0",
     "@babel/core": "^7.2.2",
     "@babel/plugin-proposal-decorators": "^7.2.3",
-    "@babel/plugin-transform-runtime": "^7.2.0",
     "@babel/preset-env": "^7.2.3",
-    "babel-cli": "^6.26.0",
-    "babel-core": "^7.0.0-bridge.0"
+    "babel-loader": "^8.0.5",
+    "webpack": "^4.28.4",
+    "webpack-cli": "^3.2.1"
   }
 }
