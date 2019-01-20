@@ -1,6 +1,6 @@
 {
   "name": "babel-plugin-parameter-decorator",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Function parameter decorator transform plugin for babel v7, just like typescript.",
   "main": "lib",
   "engine": {
