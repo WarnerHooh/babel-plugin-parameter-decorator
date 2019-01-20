@@ -21,8 +21,8 @@ And the `.babelrc` looks like:
 ```
     {
         "plugins": [
-            "transform-decorators-legacy",
-            "transform-function-parameter-decorators"
+            ["@babel/plugin-proposal-decorators", { "legacy": true }],
+            "babel-plugin-parameter-decorator"
         ]
     }
 ```
