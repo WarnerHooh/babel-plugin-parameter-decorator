@@ -8,7 +8,6 @@
   },
   "scripts": {
     "build": "babel index.js -d lib",
-    "postinstall": "npm run build",
     "prepublish": "npm run build"
   },
   "repository": {
