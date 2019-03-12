@@ -1,5 +1,5 @@
 import test from 'ava';
-import Greeter from './lib/ts';
+import Greeter from './lib';
 
 test('Should the original function work correctly.', t => {
   const greeter = new Greeter('Nice to meet you!');

@@ -40,7 +40,8 @@
   },
   "ava": {
     "files": [
-      "./test/index.js"
+      "./test/index.js",
+      "./test/ts.js"
     ]
   }
 }
