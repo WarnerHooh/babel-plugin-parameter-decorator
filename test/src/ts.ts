@@ -5,6 +5,12 @@
 
 import {required, validate} from './decorator'
 
+const Query = () => () => {}
+const Ctx = () => () => {}
+const Context = {}
+const PetModel = {}
+const Pet = {}
+
 export default class Greeter {
 
   greeting: string
@@ -24,4 +30,11 @@ export default class Greeter {
   welcome(@required('firstName') firstName, @required('lastName') lastName) {
     return "Welcome " + lastName + "." + firstName;
   }
+
+  @Query(returns => [Pet])
+  public pets(@Ctx() { requestId }: Context): Promise<PetModel[]> {
+    this.log.info(`{${requestId}} Find all users`)
+    return this.petService.find()
+  }
+
 }

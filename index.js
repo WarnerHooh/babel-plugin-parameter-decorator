@@ -1,3 +1,4 @@
+// DEBUG
 const generate = require('@babel/generator').default;
 
 module.exports = function ({types}) {
@@ -13,7 +14,10 @@ module.exports = function ({types}) {
         (path.get('params') || [])
           .slice()
           .forEach(function (param) {
-            const name = param.node.name || (param.node.parameter && param.node.parameter.name);
+
+            //const name = param.node.name || (param.node.parameter && param.node.parameter.name);
+
+            console.log(param.node.name, param.key)
 
             let resultantDecorator;
 
@@ -37,7 +41,11 @@ module.exports = function ({types}) {
               });
 
             if (resultantDecorator) {
-              param.replaceWith(types.Identifier(name));
+              //param.replaceWith(types.Identifier(name));
+
+              // Delete the decorators because we have generated code to handle them.
+              delete param.node.decorators
+              //param.replaceWith({...param.node, decorators: []})
             }
           });
 

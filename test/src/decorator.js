@@ -12,7 +12,6 @@ export function required(key) {
 }
 
 export function validate(target, property, descriptor) {
-  console.log({target, property, descriptor})
   const fn = descriptor.value;
 
   descriptor.value = function (...args) {
