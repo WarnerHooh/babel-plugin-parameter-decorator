@@ -1,5 +1,5 @@
 // DEBUG
-const generate = require('@babel/generator').default;
+//const generate = require('@babel/generator').default;
 
 module.exports = function ({types}) {
   return {
@@ -17,7 +17,7 @@ module.exports = function ({types}) {
 
             //const name = param.node.name || (param.node.parameter && param.node.parameter.name);
 
-            console.log(param.node.name, param.key)
+            //console.log(param.node.name, param.key)
 
             let resultantDecorator;
 
