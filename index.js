@@ -1,3 +1,5 @@
+const generate = require('@babel/generator').default;
+
 module.exports = function ({types}) {
   return {
     visitor: {
@@ -11,7 +13,7 @@ module.exports = function ({types}) {
         (path.get('params') || [])
           .slice()
           .forEach(function (param) {
-            const name = param.node.name;
+            const name = param.node.name || (param.node.parameter && param.node.parameter.name);
 
             let resultantDecorator;
 
@@ -31,7 +33,6 @@ module.exports = function ({types}) {
                 );
 
                 const expression = types.expressionStatement(resultantDecorator);
-
                 classDeclaration.insertAfter(expression);
               });
 
