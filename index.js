@@ -22,13 +22,23 @@ module.exports = function ({types}) {
                 const classDeclarator = path.findParent(p => p.node.type === 'VariableDeclarator');
                 const className = classDeclarator.node.id.name;
 
-                resultantDecorator = types.callExpression(
-                  decorator.expression, [
-                    types.Identifier(`${className}.prototype`),
-                    types.StringLiteral(functionName),
-                    types.NumericLiteral(param.key)
-                  ]
-                );
+                if (functionName === className) {
+                  resultantDecorator = types.callExpression(
+                    decorator.expression, [
+                      types.Identifier(className),
+                      types.Identifier('undefined'),
+                      types.NumericLiteral(param.key)
+                    ]
+                  );
+                } else {
+                  resultantDecorator = types.callExpression(
+                    decorator.expression, [
+                      types.Identifier(`${className}.prototype`),
+                      types.StringLiteral(functionName),
+                      types.NumericLiteral(param.key)
+                    ]
+                  );
+                }
 
                 const expression = types.expressionStatement(resultantDecorator);
 
