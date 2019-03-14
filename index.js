@@ -11,7 +11,7 @@ module.exports = function ({types}) {
         (path.get('params') || [])
           .slice()
           .forEach(function (param) {
-            const name = param.node.name;
+            const name = param.node.type === 'TSParameterProperty' ? param.node.parameter.name : param.node.name;
 
             let resultantDecorator;
 
