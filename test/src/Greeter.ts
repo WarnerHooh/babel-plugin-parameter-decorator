@@ -6,7 +6,8 @@ export default class Greeter {
 
     @validate
     greet(@required('name') name: string) {
-        return "Hello " + name + ", " + this.greeting;
+        const greeting = 'how are you?';
+        return "Hello " + name + ", " + (this.greeting || greeting);
     }
 
     @validate

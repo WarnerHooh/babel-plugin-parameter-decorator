@@ -8,6 +8,13 @@ test('Should the original function work correctly.', t => {
   t.is(message, 'Hello Warner, Nice to meet you!');
 });
 
+test('Should greet with default greeting.', t => {
+  const greeter = new Greeter();
+  const message = greeter.greet('Warner');
+
+  t.is(message, 'Hello Warner, how are you?');
+});
+
 test('Should throw required error when name not passed.', t => {
   const error = t.throws(() => {
     const greeter = new Greeter('Nice to meet you!');
