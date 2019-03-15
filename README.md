@@ -60,18 +60,18 @@ This package depends on `@babel/plugin-proposal-decorators`.
 And the `.babelrc` looks like: 
 
 ```
-    {
-        "plugins": [
-            ["@babel/plugin-proposal-decorators", { "legacy": true }],
-            "babel-plugin-parameter-decorator"
-        ]
-    }
+{
+    "plugins": [
+        ["@babel/plugin-proposal-decorators", { "legacy": true }],
+        "babel-plugin-parameter-decorator"
+    ]
+}
 ```
 
 
 ## Additional
 
-If you'd like to compile typescript files by webpack. (The file extension `.ts` expected, or we will get runtime error.)
+If you'd like to compile typescript files by babel. (The file extension `.ts` expected, or we will get runtime error.)
 
 ```typescript
 class Greeter {
@@ -87,14 +87,14 @@ class Greeter {
 And you need `preset-typescript` as well.
 
 ```
-    {
-        "presets": [
-            "@babel/preset-env",
-            "@babel/preset-typescript"
-        ],
-        "plugins": [
-            ["@babel/plugin-proposal-decorators", { "legacy": true }],
-            "babel-plugin-parameter-decorator"
-        ]
-    }
+{
+    "presets": [
+        "@babel/preset-env",
+        "@babel/preset-typescript"
+    ],
+    "plugins": [
+        ["@babel/plugin-proposal-decorators", { "legacy": true }],
+        "babel-plugin-parameter-decorator"
+    ]
+}
 ```
