@@ -67,3 +67,34 @@ And the `.babelrc` looks like:
         ]
     }
 ```
+
+
+## Additional
+
+If you'd like to compile typescript files by webpack. (The file extension `.ts` expected, or we will get runtime error.)
+
+```typescript
+class Greeter {
+    constructor(@Optional() greeting: string) {
+    }
+
+    @validate
+    greet(@required('name') name: string) {
+        return "Hello " + name + ", " + this.greeting;
+    }
+}
+```
+And you need `preset-typescript` as well.
+
+```
+    {
+        "presets": [
+            "@babel/preset-env",
+            "@babel/preset-typescript"
+        ],
+        "plugins": [
+            ["@babel/plugin-proposal-decorators", { "legacy": true }],
+            "babel-plugin-parameter-decorator"
+        ]
+    }
+```
