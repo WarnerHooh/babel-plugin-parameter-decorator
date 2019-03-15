@@ -41,7 +41,7 @@ module.exports = function ({types}) {
               for (const specifier of stmt.node.specifiers) {
                 const binding = stmt.scope.getBinding(specifier.local.name);
 
-                if (!binding.referencePaths.length) {
+                if (!binding.referencePaths.length && decorators[specifier.local.name]) {
                   binding.referencePaths.push({
                     parent: decorators[specifier.local.name]
                   })
