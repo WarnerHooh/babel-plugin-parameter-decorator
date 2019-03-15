@@ -27,3 +27,8 @@ export function required(key) {
     ]
   };
 }
+
+export function Optional() {
+  return function (target, propertyKey, parameterIndex) {
+  };
+}

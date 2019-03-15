@@ -8,7 +8,7 @@
   },
   "scripts": {
     "build": "babel index.js -d lib",
-    "test": "babel -x .js,.ts test/src/ -d test/lib && ava",
+    "test": "babel -x .js,.ts test/src/ -d test/lib && ava test/*.js",
     "prepublish": "npm run build"
   },
   "repository": {

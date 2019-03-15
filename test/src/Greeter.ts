@@ -1,7 +1,7 @@
-import {validate, required} from './decorators'
+import {validate, required, Optional} from './decorators'
 
 export default class Greeter {
-    constructor(@required('name') private greeting: string) {
+    constructor(@Optional() private greeting: string) {
     }
 
     @validate
@@ -9,6 +9,7 @@ export default class Greeter {
         return "Hello " + name + ", " + this.greeting;
     }
 
+    @validate
     welcome(@required('firstName') firstName: string, @required('lastName') lastName: string) {
         return "Welcome " + lastName + "." + firstName;
     }
