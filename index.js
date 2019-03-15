@@ -1,6 +1,56 @@
+import traverse from "babel-traverse";
+import {extname} from 'path';
+
 module.exports = function ({types}) {
   return {
     visitor: {
+      /**
+       * For typescript compilation. Avoid import statement of param decorator functions being Elided.
+       */
+      Program(path, state) {
+        const extension = extname(state.file.opts.filename);
+
+        if (extension === '.ts') {
+          const decorators = Object.create(null);
+
+          try {
+            traverse(path.node, {
+              enter(program) {
+                const declaration = program.node.declaration;
+                if (declaration && declaration.type === 'ClassDeclaration') {
+                  declaration.body.body.forEach(function(body) {
+                    body.params.forEach(function(param) {
+                      param.decorators.forEach(function(decorator) {
+                        decorators[decorator.expression.callee.name] = decorator;
+                      })
+                    });
+                  })
+                }
+              }
+            });
+          } catch(e) {
+          }
+
+          for (const stmt of path.get("body")) {
+            if (stmt.node.type === 'ImportDeclaration') {
+
+              if (stmt.node.specifiers.length === 0) {
+                continue;
+              }
+
+              for (const specifier of stmt.node.specifiers) {
+                const binding = stmt.scope.getBinding(specifier.local.name);
+
+                if (!binding.referencePaths.length) {
+                  binding.referencePaths.push({
+                    parent: decorators[specifier.local.name]
+                  })
+                }
+              }
+            }
+          }
+        }
+      },
       Function: function (path) {
         let functionName = '';
 
