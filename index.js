@@ -6,9 +6,7 @@ module.exports = function ({types}) {
 
         if (path.node.id) {
           functionName = path.node.id.name;
-        }
-        
-        if (!functionName && path.node && path.node.key && path.node.key.name) {
+        } else if (path.node.key) {
           functionName = path.node.key.name;
         }
 
