@@ -7,6 +7,10 @@ module.exports = function ({types}) {
         if (path.node.id) {
           functionName = path.node.id.name;
         }
+        
+        if (!functionName && path.node && path.node.key && path.node.key.name) {
+          functionName = path.node.key.name;
+        }
 
         (path.get('params') || [])
           .slice()
