@@ -1,17 +1,25 @@
-import {validate, required, Optional} from './decorators'
+import {validate, required, Inject} from './decorators'
+import User from 'User'
 
 export default class Greeter {
-    constructor(@Optional() private greeting: string) {
-    }
 
-    @validate
-    greet(@required('name') name: string) {
-        const greeting = 'how are you?';
-        return "Hello " + name + ", " + (this.greeting || greeting);
-    }
+  public count: number = this.user.number;
 
-    @validate
-    welcome(@required('firstName') firstName: string, @required('lastName') lastName: string) {
-        return "Welcome " + lastName + "." + firstName;
-    }
+  constructor(private greeting: string, @Inject(User) private user: User) {
+  }
+
+  @validate
+  greet(@required('name') name: string) {
+    this.user.count();
+
+    const greeting = 'how are you?';
+    return "Hello " + name + ", " + (this.greeting || greeting);
+  }
+
+  @validate
+  welcome(@required('firstName') firstName: string, @required('lastName') lastName: string) {
+    this.user.count();
+
+    return "Welcome " + lastName + "." + firstName;
+  }
 }

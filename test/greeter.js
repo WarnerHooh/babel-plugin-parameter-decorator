@@ -39,3 +39,11 @@ test('Should support multiple parameters, validate success', t => {
 
   t.is(message, 'Welcome Warner.Hooh');
 });
+
+test('Should count the greeting times', t => {
+  const greeter = new Greeter();
+  greeter.greet('bro');
+  greeter.welcome('Hooh', 'Warner');
+
+  t.is(2, greeter.count);
+});

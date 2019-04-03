@@ -28,7 +28,7 @@ export function required(key) {
   };
 }
 
-export function Optional() {
+export function Inject() {
   return function (target, propertyKey, parameterIndex) {
   };
 }
