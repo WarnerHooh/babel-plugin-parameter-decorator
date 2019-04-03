@@ -1,7 +1,20 @@
 import traverse from "babel-traverse";
-import {extname} from 'path';
+import { extname } from 'path';
 
-module.exports = function ({types}) {
+function isInType(path) {
+  switch (path.parent.type) {
+    case "TSTypeReference":
+    case "TSQualifiedName":
+    case "TSExpressionWithTypeArguments":
+    case "TSTypeQuery":
+      return true;
+
+    default:
+      return false;
+  }
+}
+
+module.exports = function ({ types }) {
   return {
     visitor: {
       /**
@@ -18,17 +31,19 @@ module.exports = function ({types}) {
               enter(program) {
                 const declaration = program.node.declaration;
                 if (declaration && declaration.type === 'ClassDeclaration') {
-                  declaration.body.body.forEach(function(body) {
-                    body.params.forEach(function(param) {
-                      param.decorators.forEach(function(decorator) {
-                        decorators[decorator.expression.callee.name] = decorator;
-                      })
-                    });
-                  })
+                  declaration.body.body
+                    .filter(node => node.type === 'ClassMethod')
+                    .forEach(function (body) {
+                      body.params.forEach(function (param) {
+                        param.decorators.forEach(function (decorator) {
+                          decorators[decorator.expression.callee.name] = decorator;
+                        })
+                      });
+                    })
                 }
               }
             });
-          } catch(e) {
+          } catch (e) {
           }
 
           for (const stmt of path.get("body")) {
@@ -41,10 +56,27 @@ module.exports = function ({types}) {
               for (const specifier of stmt.node.specifiers) {
                 const binding = stmt.scope.getBinding(specifier.local.name);
 
-                if (!binding.referencePaths.length && decorators[specifier.local.name]) {
-                  binding.referencePaths.push({
-                    parent: decorators[specifier.local.name]
-                  })
+                if (!binding.referencePaths.length) {
+                  if (decorators[specifier.local.name]) {
+                    binding.referencePaths.push({
+                      parent: decorators[specifier.local.name]
+                    });
+                  }
+                } else {
+                  const allTypeRefs = binding.referencePaths.reduce((prev, next) => prev || isInType(next), false);
+                  if (allTypeRefs) {
+                    Object.keys(decorators).forEach(k => {
+                      const decorator = decorators[k];
+
+                      decorator.expression.arguments.forEach(arg => {
+                        if (arg.name === specifier.local.name) {
+                          binding.referencePaths.push({
+                            parent: decorator.expression
+                          });
+                        }
+                      })
+                    })
+                  }
                 }
               }
             }
