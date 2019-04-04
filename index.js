@@ -32,7 +32,7 @@ module.exports = function ({ types }) {
                 const declaration = program.node.declaration;
                 if (declaration && declaration.type === 'ClassDeclaration') {
                   declaration.body.body
-                    .filter(function(node) {
+                    .filter(function (node) {
                       return node.type === 'ClassMethod';
                     })
                     .forEach(function (body) {
@@ -107,13 +107,15 @@ module.exports = function ({ types }) {
                 const className = classDeclarator.node.id.name;
 
                 if (functionName === className) {
-                  resultantDecorator = types.callExpression(
+                  // TODO overwrite class declaration last
+                  const callExpression = types.callExpression(
                     decorator.expression, [
                       types.Identifier(className),
                       types.Identifier('undefined'),
                       types.NumericLiteral(param.key)
                     ]
                   );
+                  resultantDecorator = types.assignmentExpression('=', types.Identifier(className), callExpression);
                 } else {
                   resultantDecorator = types.callExpression(
                     decorator.expression, [
@@ -125,7 +127,7 @@ module.exports = function ({ types }) {
                 }
 
                 const expression = types.expressionStatement(resultantDecorator);
-
+                // TODO the order of insertion
                 classDeclaration.insertAfter(expression);
               });
 

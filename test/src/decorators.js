@@ -30,5 +30,6 @@ export function required(key) {
 
 export function Inject(clazz) {
   return function (target, propertyKey, parameterIndex) {
+    return target;
   };
 }
