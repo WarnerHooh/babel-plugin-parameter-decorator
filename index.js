@@ -32,10 +32,12 @@ module.exports = function ({ types }) {
                 const declaration = program.node.declaration;
                 if (declaration && declaration.type === 'ClassDeclaration') {
                   declaration.body.body
-                    .filter(node => node.type === 'ClassMethod')
+                    .filter(function(node) {
+                      return node.type === 'ClassMethod';
+                    })
                     .forEach(function (body) {
-                      body.params.forEach(function (param) {
-                        param.decorators.forEach(function (decorator) {
+                      (body.params || []).forEach(function (param) {
+                        (param.decorators || []).forEach(function (decorator) {
                           decorators[decorator.expression.callee.name] = decorator;
                         })
                       });

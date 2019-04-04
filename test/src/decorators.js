@@ -28,7 +28,7 @@ export function required(key) {
   };
 }
 
-export function Inject() {
+export function Inject(clazz) {
   return function (target, propertyKey, parameterIndex) {
   };
 }

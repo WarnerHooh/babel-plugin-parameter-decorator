@@ -1,15 +1,17 @@
 import test from 'ava';
 import Greeter from './lib/Greeter';
+import { GreeterFactory } from "./lib/GreeterFactory";
+
 
 test('Should the original function work correctly.', t => {
-  const greeter = new Greeter('Nice to meet you!');
+  const greeter = GreeterFactory.build('Nice to meet you!');
   const message = greeter.greet('Warner');
 
   t.is(message, 'Hello Warner, Nice to meet you!');
 });
 
 test('Should greet with default greeting.', t => {
-  const greeter = new Greeter();
+  const greeter = GreeterFactory.build();
   const message = greeter.greet('Warner');
 
   t.is(message, 'Hello Warner, how are you?');
@@ -17,7 +19,7 @@ test('Should greet with default greeting.', t => {
 
 test('Should throw required error when name not passed.', t => {
   const error = t.throws(() => {
-    const greeter = new Greeter('Nice to meet you!');
+    const greeter = GreeterFactory.build('Nice to meet you!');
     const message = greeter.greet();
   }, Error);
 
@@ -26,7 +28,7 @@ test('Should throw required error when name not passed.', t => {
 
 test('Should support multiple parameters, validate failed', t => {
   const error = t.throws(() => {
-    const greeter = new Greeter();
+    const greeter = GreeterFactory.build();
     const message = greeter.welcome('Hooh');
   }, Error);
 
@@ -34,16 +36,16 @@ test('Should support multiple parameters, validate failed', t => {
 });
 
 test('Should support multiple parameters, validate success', t => {
-  const greeter = new Greeter();
+  const greeter = GreeterFactory.build();
   const message = greeter.welcome('Hooh', 'Warner');
 
   t.is(message, 'Welcome Warner.Hooh');
 });
 
 test('Should count the greeting times', t => {
-  const greeter = new Greeter();
+  const greeter = GreeterFactory.build();
   greeter.greet('bro');
   greeter.welcome('Hooh', 'Warner');
 
-  t.is(2, greeter.count);
+  t.is(2, greeter.counter.number);
 });

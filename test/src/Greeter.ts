@@ -1,16 +1,16 @@
 import {validate, required, Inject} from './decorators'
-import User from 'User'
+import Sentinel, {Counter} from './Sentinel'
 
 export default class Greeter {
 
-  public count: number = this.user.number;
+  public counter: Counter = this.sentinel.counter;
 
-  constructor(private greeting: string, @Inject(User) private user: User) {
+  constructor(private greeting: string, @Inject(Sentinel) private sentinel: Sentinel) {
   }
 
   @validate
   greet(@required('name') name: string) {
-    this.user.count();
+    this.sentinel.count();
 
     const greeting = 'how are you?';
     return "Hello " + name + ", " + (this.greeting || greeting);
@@ -18,7 +18,7 @@ export default class Greeter {
 
   @validate
   welcome(@required('firstName') firstName: string, @required('lastName') lastName: string) {
-    this.user.count();
+    this.sentinel.count();
 
     return "Welcome " + lastName + "." + firstName;
   }
