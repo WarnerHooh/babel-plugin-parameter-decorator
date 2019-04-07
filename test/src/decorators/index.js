@@ -46,8 +46,8 @@ export function Factory(target) {
       const metaInject = target[metadata] || [];
       for (let i = 0; i < metaInject.length; i++) {
         const Clazz = metaInject[i];
-        if (Clazz) {
-          args.splice(i, 0, Reflect.construct(Clazz, []));
+        if (Clazz && args[i] === null) {
+          args[i] = Reflect.construct(Clazz, []);
         }
       }
       super(...args);

@@ -1,4 +1,4 @@
-import {validate, required} from './decorators'
+import {validate, required} from '../decorators'
 
 export default class Greeter {
   constructor(message) {

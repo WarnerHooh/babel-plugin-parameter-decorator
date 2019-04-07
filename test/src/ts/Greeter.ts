@@ -1,4 +1,4 @@
-import {validate, required, Inject, Factory} from './decorators'
+import {validate, required, Inject, Factory} from '../decorators'
 import Sentinel, {Counter} from './Sentinel'
 
 @Factory

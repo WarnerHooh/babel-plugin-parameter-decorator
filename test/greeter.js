@@ -1,6 +1,5 @@
 import test from 'ava';
-import Greeter from './lib/Greeter';
-import { GreeterFactory } from "./lib/GreeterFactory";
+import { GreeterFactory } from "./lib/ts/GreeterFactory";
 
 
 test('Should the original function work correctly.', t => {
