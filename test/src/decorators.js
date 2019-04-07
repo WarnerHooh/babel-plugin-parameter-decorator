@@ -28,8 +28,29 @@ export function required(key) {
   };
 }
 
-export function Inject(clazz) {
-  return function (target, propertyKey, parameterIndex) {
+export function Inject(Clazz) {
+  return function (target, unusedKey, parameterIndex) {
+    const metadata = `meta_ctr_inject`;
+    target[metadata] = target[metadata] || [];
+    target[metadata][parameterIndex] = Clazz;
+
     return target;
+  };
+}
+
+export function Factory(target) {
+  const metadata = `meta_ctr_inject`;
+
+  return class extends target {
+    constructor(...args) {
+      const metaInject = target[metadata] || [];
+      for (let i = 0; i < metaInject.length; i++) {
+        const Clazz = metaInject[i];
+        if (Clazz) {
+          args.splice(i, 0, Reflect.construct(Clazz, []));
+        }
+      }
+      super(...args);
+    }
   };
 }

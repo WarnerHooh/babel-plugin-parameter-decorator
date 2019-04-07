@@ -1,7 +1,8 @@
-import {validate, required, Inject} from './decorators'
+import {validate, required, Inject, Factory} from './decorators'
 import Sentinel, {Counter} from './Sentinel'
 
-export default class Greeter {
+@Factory
+class Greeter {
 
   public counter: Counter = this.sentinel.counter;
 
@@ -23,3 +24,5 @@ export default class Greeter {
     return "Welcome " + lastName + "." + firstName;
   }
 }
+
+export default Greeter;

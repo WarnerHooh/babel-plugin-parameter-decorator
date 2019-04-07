@@ -1,4 +1,3 @@
-import traverse from "babel-traverse";
 import { extname } from 'path';
 
 function isInType(path) {
@@ -26,27 +25,21 @@ module.exports = function ({ types }) {
         if (extension === '.ts') {
           const decorators = Object.create(null);
 
-          try {
-            traverse(path.node, {
-              enter(program) {
-                const declaration = program.node.declaration;
-                if (declaration && declaration.type === 'ClassDeclaration') {
-                  declaration.body.body
-                    .filter(function (node) {
-                      return node.type === 'ClassMethod';
-                    })
-                    .forEach(function (body) {
-                      (body.params || []).forEach(function (param) {
-                        (param.decorators || []).forEach(function (decorator) {
-                          decorators[decorator.expression.callee.name] = decorator;
-                        })
-                      });
-                    })
-                }
-              }
+          path.node.body
+            .filter(it => it.type === 'ClassDeclaration' || (it.type === 'ExportDefaultDeclaration' && it.declaration.type === 'ClassDeclaration'))
+            .map(it => {
+              return it.type === 'ClassDeclaration' ? it : it.declaration;
+            })
+            .forEach(clazz => {
+              clazz.body.body.forEach(function (body) {
+
+                (body.params || []).forEach(function (param) {
+                  (param.decorators || []).forEach(function (decorator) {
+                    decorators[decorator.expression.callee.name] = decorator;
+                  });
+                });
+              })
             });
-          } catch (e) {
-          }
 
           for (const stmt of path.get("body")) {
             if (stmt.node.type === 'ImportDeclaration') {
@@ -102,21 +95,25 @@ module.exports = function ({ types }) {
             (param.node.decorators || [])
               .slice()
               .forEach(function (decorator) {
-                const classDeclaration = path.findParent(p => p.node.type === 'VariableDeclaration');
                 const classDeclarator = path.findParent(p => p.node.type === 'VariableDeclarator');
                 const className = classDeclarator.node.id.name;
 
                 if (functionName === className) {
-                  // TODO overwrite class declaration last
-                  const callExpression = types.callExpression(
+                  resultantDecorator = types.callExpression(
                     decorator.expression, [
                       types.Identifier(className),
                       types.Identifier('undefined'),
                       types.NumericLiteral(param.key)
                     ]
                   );
-                  resultantDecorator = types.assignmentExpression('=', types.Identifier(className), callExpression);
+                  const assignment = types.assignmentExpression('=', types.Identifier(className), resultantDecorator);
+                  const expression = types.expressionStatement(assignment);
+                  // TODO: the order of insertion
+                  path.insertAfter(expression);
                 } else {
+                  const classParent = path.findParent(function (p) {
+                    return p.node.type === 'CallExpression';
+                  });
                   resultantDecorator = types.callExpression(
                     decorator.expression, [
                       types.Identifier(`${className}.prototype`),
@@ -124,11 +121,12 @@ module.exports = function ({ types }) {
                       types.NumericLiteral(param.key)
                     ]
                   );
+
+                  const expression = types.expressionStatement(resultantDecorator);
+                  // TODO: the order of insertion
+                  classParent.insertAfter(expression);
                 }
 
-                const expression = types.expressionStatement(resultantDecorator);
-                // TODO the order of insertion
-                classDeclaration.insertAfter(expression);
               });
 
             if (resultantDecorator) {
