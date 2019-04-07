@@ -46,5 +46,5 @@ test('Should count the greeting times', t => {
   greeter.greet('bro');
   greeter.welcome('Hooh', 'Warner');
 
-  t.is(2, greeter.counter.number);
+  t.is(2, greeter.count());
 });

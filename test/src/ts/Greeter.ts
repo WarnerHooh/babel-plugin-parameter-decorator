@@ -4,7 +4,7 @@ import Sentinel, {Counter} from './Sentinel'
 @Factory
 class Greeter {
 
-  public counter: Counter = this.sentinel.counter;
+  private counter: Counter = this.sentinel.counter;
 
   constructor(private greeting: string, @Inject(Sentinel) private sentinel: Sentinel) {
   }
@@ -22,6 +22,10 @@ class Greeter {
     this.sentinel.count();
 
     return "Welcome " + lastName + "." + firstName;
+  }
+
+  count() {
+    return this.counter.number;
   }
 }
 

@@ -38,14 +38,14 @@ function required(key) {
 }
 
 class Greeter {
-    constructor(message) {
-        this.greeting = message;
-    }
+  constructor(message) {
+    this.greeting = message;
+  }
 
-    @validate
-    greet(@required('name') name) {
-        return "Hello " + name + ", " + this.greeting;
-    }
+  @validate
+   greet(@required('name') name) {
+    return "Hello " + name + ", " + this.greeting;
+  }
 }
 ```
 
@@ -71,30 +71,39 @@ And the `.babelrc` looks like:
 
 ## Additional
 
-If you'd like to compile typescript files by babel. (The file extension `.ts` expected, or we will get runtime error.)
+If you'd like to compile typescript files by babel, the file extension `.ts` expected, or we will get runtime error. Hopefully this plugin would get along with typescript `private/public` keywords in `constructor`.   
 
 ```typescript
+@Factory
 class Greeter {
-    constructor(@Optional() greeting: string) {
-    }
+  
+  private counter: Counter = this.sentinel.counter;
+  
+  constructor(private greeting: string, @Inject(Sentinel) private sentinel: Sentinel) {
+  }
 
-    @validate
-    greet(@required('name') name: string) {
-        return "Hello " + name + ", " + this.greeting;
-    }
+  @validate
+  greet(@required('name') name: string) {
+    return "Hello " + name + ", " + this.greeting;
+  }
+  
+  count() {
+    return this.counter.number;
+  }
 }
 ```
-And you need `preset-typescript` as well.
+And your `.babelrc` looks like:
 
 ```
 {
-    "presets": [
-        "@babel/preset-env",
-        "@babel/preset-typescript"
-    ],
-    "plugins": [
-        ["@babel/plugin-proposal-decorators", { "legacy": true }],
-        "babel-plugin-parameter-decorator"
-    ]
+  "presets": [
+    "@babel/preset-env",
+    "@babel/preset-typescript"
+  ],
+  "plugins": [
+    ["@babel/plugin-proposal-decorators", { "legacy": true }],
+    ["@babel/plugin-proposal-class-properties", { "loose" : true }],
+    "babel-plugin-parameter-decorator"
+  ]
 }
 ```
