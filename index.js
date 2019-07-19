@@ -35,7 +35,11 @@ module.exports = function ({ types }) {
 
                 (body.params || []).forEach(function (param) {
                   (param.decorators || []).forEach(function (decorator) {
-                    decorators[decorator.expression.callee.name] = decorator;
+                    if (decorator.expression.callee) {
+                      decorators[decorator.expression.callee.name] = decorator;
+                    } else {
+                      decorators[decorator.expression.name] = decorator;
+                    }
                   });
                 });
               })
