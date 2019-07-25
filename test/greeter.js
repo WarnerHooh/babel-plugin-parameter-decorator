@@ -4,7 +4,7 @@ import { GreeterFactory } from "./lib/ts/GreeterFactory";
 
 test('Should the original function work correctly.', t => {
   const greeter = GreeterFactory.build('Nice to meet you!');
-  const message = greeter.greet('Warner');
+  const message = greeter.greet('Warner', '😆');
 
   t.is(message, 'Hello Warner, Nice to meet you!');
 });
