@@ -1,4 +1,4 @@
-import {validate, required, Inject, Factory} from '../decorators'
+import {validate, required, optional, Inject, Factory} from '../decorators'
 import Sentinel, {Counter} from './Sentinel'
 
 @Factory
@@ -10,7 +10,7 @@ class Greeter {
   }
 
   @validate
-  greet(@required('name') name: string) {
+  greet(@required('name') name: string, @optional emoj) {
     this.sentinel.count();
 
     const greeting = 'how are you?';

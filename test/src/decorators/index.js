@@ -2,10 +2,17 @@ export function validate(target, property, descriptor) {
   const fn = descriptor.value;
 
   descriptor.value = function (...args) {
-    const metadata = `meta_${property}`;
-    target[metadata].forEach(function (metadata) {
+    const req_metadata = `meta_req_${property}`;
+    (target[req_metadata] || []).forEach(function (metadata) {
       if (args[metadata.index] === undefined) {
         throw new Error(`${metadata.key} is required`);
+      }
+    });
+
+    const opt_metadata = `meta_opt_${property}`;
+    (target[opt_metadata] || []).forEach(function (metadata) {
+      if (args[metadata.index] === undefined) {
+        console.warn(`The ${metadata.index + 1}(th) optional argument is missing of method ${fn.name}`);
       }
     });
 
@@ -17,7 +24,7 @@ export function validate(target, property, descriptor) {
 
 export function required(key) {
   return function (target, propertyKey, parameterIndex) {
-    const metadata = `meta_${propertyKey}`;
+    const metadata = `meta_req_${propertyKey}`;
     target[metadata] = [
       ...(target[metadata] || []),
       {
@@ -26,6 +33,16 @@ export function required(key) {
       }
     ]
   };
+}
+
+export function optional(target, propertyKey, parameterIndex) {
+  const metadata = `meta_opt_${propertyKey}`;
+  target[metadata] = [
+    ...(target[metadata] || []),
+    {
+      index: parameterIndex,
+    }
+  ]
 }
 
 export function Inject(Clazz) {

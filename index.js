@@ -67,7 +67,7 @@ module.exports = function ({ types }) {
                     Object.keys(decorators).forEach(k => {
                       const decorator = decorators[k];
 
-                      decorator.expression.arguments.forEach(arg => {
+                      (decorator.expression.arguments || []).forEach(arg => {
                         if (arg.name === specifier.local.name) {
                           binding.referencePaths.push({
                             parent: decorator.expression
