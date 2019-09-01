@@ -1,6 +1,7 @@
 # Babel Plugin Parameter Decorator
 
 [![](https://travis-ci.com/WarnerHooh/babel-plugin-parameter-decorator.svg?branch=master)](https://travis-ci.com/WarnerHooh/babel-plugin-parameter-decorator)
+[![](https://badge.fury.io/js/babel-plugin-parameter-decorator.svg)](https://badge.fury.io/js/babel-plugin-parameter-decorator)
 [![](https://img.shields.io/npm/dt/babel-plugin-parameter-decorator.svg)](https://www.npmjs.com/package/babel-plugin-parameter-decorator)
 [![](https://img.shields.io/npm/dm/babel-plugin-parameter-decorator.svg)](https://www.npmjs.com/package/babel-plugin-parameter-decorator)
 
