@@ -22,7 +22,7 @@ module.exports = function ({ types }) {
       Program(path, state) {
         const extension = extname(state.file.opts.filename);
 
-        if (extension === '.ts') {
+        if (extension === '.ts' || extension === '.tsx') {
           const decorators = Object.create(null);
 
           path.node.body
