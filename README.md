@@ -72,7 +72,7 @@ And the `.babelrc` looks like:
 
 ## Additional
 
-If you'd like to compile typescript files by babel, the file extension `.ts` expected, or we will get runtime error! 
+If you'd like to compile typescript files by babel, the file extensions `.ts` or `.tsx` expected, or we will get runtime error! 
 
 🎊 Hopefully this plugin would get along with typescript `private/public` keywords in `constructor`. For [example](https://github.com/WarnerHooh/babel-plugin-parameter-decorator/blob/dev/test/src/ts/Greeter.ts),
 
