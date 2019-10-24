@@ -112,7 +112,9 @@ module.exports = function ({ types }) {
                       types.NumericLiteral(param.key)
                     ]
                   );
-                  const assignment = types.assignmentExpression('=', types.Identifier(className), resultantDecorator);
+                  const resultantDecoratorWithFallback = types.logicalExpression("||", resultantDecorator, types.Identifier(className))
+
+                  const assignment = types.assignmentExpression('=', types.Identifier(className), resultantDecoratorWithFallback);
                   const expression = types.expressionStatement(assignment);
                   // TODO: the order of insertion
                   path.insertAfter(expression);
