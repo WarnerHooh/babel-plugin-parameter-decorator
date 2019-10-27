@@ -13,7 +13,46 @@ function isInType(path) {
   }
 }
 
+
 module.exports = function ({ types }) {
+  const decoratorExpressionForConstructor = (decorator, param) => (className) => {
+    const resultantDecorator = types.callExpression(
+      decorator.expression, [
+        types.Identifier(className),
+        types.Identifier('undefined'),
+        types.NumericLiteral(param.key)
+      ]
+    );
+    const resultantDecoratorWithFallback = types.logicalExpression("||", resultantDecorator, types.Identifier(className));
+    const assignment = types.assignmentExpression('=', types.Identifier(className), resultantDecoratorWithFallback);
+    return types.expressionStatement(assignment);
+  };
+
+  const decoratorExpressionForMethod = (decorator, param) => (className, functionName) => {
+    const resultantDecorator = types.callExpression(
+      decorator.expression, [
+        types.Identifier(`${className}.prototype`),
+        types.StringLiteral(functionName),
+        types.NumericLiteral(param.key)
+      ]
+    );
+
+    return types.expressionStatement(resultantDecorator);
+  };
+
+  const findIdentifierAfterAssignment = (path) => {
+    const assignment = path.findParent(p => p.node.type === 'AssignmentExpression');
+    const expression = assignment.parent.expressions[0];
+
+    if (expression.right.type === 'SequenceExpression') {
+      return expression.right.expressions[0].left.name;
+    } else if (expression.right.type === 'ClassExpression') {
+      return expression.left.name;
+    }
+
+    return null;
+  };
+
   return {
     visitor: {
       /**
@@ -95,53 +134,48 @@ module.exports = function ({ types }) {
           .slice()
           .forEach(function (param) {
             const name = param.node.type === 'TSParameterProperty' ? param.node.parameter.name : param.node.name;
+            const decorators = (param.node.decorators || []);
+            const transformable = decorators.length;
 
-            let resultantDecorator;
-
-            (param.node.decorators || [])
-              .slice()
+            decorators.slice()
               .forEach(function (decorator) {
-                const classDeclarator = path.findParent(p => p.node.type === 'VariableDeclarator');
-                const className = classDeclarator.node.id.name;
 
-                if (functionName === className) {
-                  resultantDecorator = types.callExpression(
-                    decorator.expression, [
-                      types.Identifier(className),
-                      types.Identifier('undefined'),
-                      types.NumericLiteral(param.key)
-                    ]
-                  );
-                  const resultantDecoratorWithFallback = types.logicalExpression("||", resultantDecorator, types.Identifier(className))
+                // For class support env
+                if (path.type === 'ClassMethod') {
+                  const parentNode = path.parentPath.parentPath;
+                  parentNode.insertAfter(null);
+                  const classIdentifier = findIdentifierAfterAssignment(path);
 
-                  const assignment = types.assignmentExpression('=', types.Identifier(className), resultantDecoratorWithFallback);
-                  const expression = types.expressionStatement(assignment);
-                  // TODO: the order of insertion
-                  path.insertAfter(expression);
+                  if (functionName === 'constructor') {
+                    const expression = decoratorExpressionForConstructor(decorator, param)(classIdentifier);
+                    // TODO: the order of insertion
+                    parentNode.insertAfter(expression);
+                  } else {
+                    const expression = decoratorExpressionForMethod(decorator, param)(classIdentifier, functionName);
+                    // TODO: the order of insertion
+                    parentNode.insertAfter(expression);
+                  }
                 } else {
-                  const classParent = path.findParent(function (p) {
-                    return p.node.type === 'CallExpression';
-                  });
-                  resultantDecorator = types.callExpression(
-                    decorator.expression, [
-                      types.Identifier(`${className}.prototype`),
-                      types.StringLiteral(functionName),
-                      types.NumericLiteral(param.key)
-                    ]
-                  );
+                  const classDeclarator = path.findParent(p => p.node.type === 'VariableDeclarator');
+                  const className = classDeclarator.node.id.name;
 
-                  const expression = types.expressionStatement(resultantDecorator);
-                  // TODO: the order of insertion
-                  classParent.insertAfter(expression);
+                  if (functionName === className) {
+                    const expression = decoratorExpressionForConstructor(decorator, param)(className);
+                    // TODO: the order of insertion
+                    path.insertAfter(expression);
+                  } else {
+                    const classParent = path.findParent(p => p.node.type === 'CallExpression');
+                    const expression = decoratorExpressionForMethod(decorator, param)(className, functionName);
+                    // TODO: the order of insertion
+                    classParent.insertAfter(expression);
+                  }
                 }
-
               });
 
-            if (resultantDecorator) {
+            if (transformable) {
               param.replaceWith(types.Identifier(name));
             }
           });
-
       }
     }
   }
