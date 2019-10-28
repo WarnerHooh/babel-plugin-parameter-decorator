@@ -162,7 +162,12 @@ module.exports = function ({ types }) {
                   if (functionName === className) {
                     const expression = decoratorExpressionForConstructor(decorator, param)(className);
                     // TODO: the order of insertion
-                    path.insertAfter(expression);
+                    if (path.parentKey === 'body') {
+                      path.insertAfter(expression);
+                    } else {
+                      const bodyParent = path.findParent(p => p.parentKey === 'body');
+                      bodyParent.insertAfter(expression);
+                    }
                   } else {
                     const classParent = path.findParent(p => p.node.type === 'CallExpression');
                     const expression = decoratorExpressionForMethod(decorator, param)(className, functionName);
