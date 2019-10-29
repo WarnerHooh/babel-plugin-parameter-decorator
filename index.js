@@ -13,7 +13,6 @@ function isInType(path) {
   }
 }
 
-
 module.exports = function ({ types }) {
   const decoratorExpressionForConstructor = (decorator, param) => (className) => {
     const resultantDecorator = types.callExpression(
@@ -42,12 +41,11 @@ module.exports = function ({ types }) {
 
   const findIdentifierAfterAssignment = (path) => {
     const assignment = path.findParent(p => p.node.type === 'AssignmentExpression');
-    const expression = assignment.parent.expressions[0];
 
-    if (expression.right.type === 'SequenceExpression') {
-      return expression.right.expressions[0].left.name;
-    } else if (expression.right.type === 'ClassExpression') {
-      return expression.left.name;
+    if (assignment.node.right.type === 'SequenceExpression') {
+      return assignment.node.right.expressions[1].name;
+    } else if (assignment.node.right.type === 'ClassExpression') {
+      return assignment.node.left.name;
     }
 
     return null;
@@ -143,8 +141,19 @@ module.exports = function ({ types }) {
                 // For class support env
                 if (path.type === 'ClassMethod') {
                   const parentNode = path.parentPath.parentPath;
-                  parentNode.insertAfter(null);
-                  const classIdentifier = findIdentifierAfterAssignment(path);
+                  const classDeclaration = path.findParent(p => p.type === 'ClassDeclaration');
+
+                  let classIdentifier;
+
+                  // without class decorator
+                  if (classDeclaration) {
+                    classIdentifier = classDeclaration.node.id.name;
+                  // with class decorator
+                  } else {
+                    // Correct the temp identifier reference
+                    parentNode.insertAfter(null);
+                    classIdentifier = findIdentifierAfterAssignment(path);
+                  }
 
                   if (functionName === 'constructor') {
                     const expression = decoratorExpressionForConstructor(decorator, param)(classIdentifier);
@@ -164,6 +173,7 @@ module.exports = function ({ types }) {
                     // TODO: the order of insertion
                     if (path.parentKey === 'body') {
                       path.insertAfter(expression);
+                    // In case there is only a constructor method
                     } else {
                       const bodyParent = path.findParent(p => p.parentKey === 'body');
                       bodyParent.insertAfter(expression);
