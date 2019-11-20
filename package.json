@@ -2,12 +2,12 @@
   "name": "babel-plugin-parameter-decorator",
   "version": "1.0.10",
   "description": "Function parameter decorator transform plugin for babel v7, just like typescript.",
-  "main": "lib",
+  "main": "lib/index.js",
   "engine": {
     "node": "*"
   },
   "scripts": {
-    "build": "babel index.js -d lib",
+    "build": "babel src/index.js -d lib",
     "test": "babel -x .js,.ts test/src/ -d test/lib && ava",
     "prepublish": "npm run build"
   },
