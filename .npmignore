@@ -1,3 +1,5 @@
 example/
 test/
 src/
+.idea/
+.github/
