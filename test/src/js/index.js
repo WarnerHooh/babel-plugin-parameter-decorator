@@ -15,4 +15,9 @@ export default class Greeter {
   welcome(@required('firstName') firstName, @required('lastName') lastName) {
     return "Welcome " + lastName + "." + firstName;
   }
+
+  @validate
+  meet(@required('guest') { name: nickname, title }) {
+    return "Nice to meet you " + title + ' ' + nickname + '.';
+  }
 }

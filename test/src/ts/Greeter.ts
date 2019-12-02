@@ -24,6 +24,13 @@ class Greeter {
     return "Welcome " + lastName + "." + firstName;
   }
 
+  @validate
+  meet(@required('guest') { name: nickname, title }) {
+    this.sentinel.count();
+
+    return "Nice to meet you " + title + ' ' + nickname + '.';
+  }
+
   count() {
     return this.counter.number;
   }

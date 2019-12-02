@@ -39,3 +39,19 @@ test('Should support multiple parameters, validate success', t => {
 
   t.is(message, 'Welcome Warner.Hooh');
 });
+
+test('Should support destructured parameters, validate failed', t => {
+  const error = t.throws(() => {
+    const greeter = new Greeter();
+    const message = greeter.meet();
+  }, Error);
+
+  t.is(error.message, 'guest is required');
+});
+
+test('Should support destructured parameters, validate success', t => {
+  const greeter = new Greeter();
+  const message = greeter.meet({ name: 'Hooh', title: 'Mr' });
+
+  t.is(message, 'Nice to meet you Mr Hooh.');
+});

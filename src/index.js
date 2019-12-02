@@ -51,6 +51,17 @@ module.exports = function ({ types }) {
     return null;
   };
 
+  const getParamReplacement = (path) => {
+    switch (path.node.type) {
+      case 'ObjectPattern':
+        return types.ObjectPattern(path.node.properties);
+      case 'TSParameterProperty':
+        return types.Identifier(path.node.parameter.name);
+      default:
+        return types.Identifier(path.node.name);
+    }
+  };
+
   return {
     visitor: {
       /**
@@ -131,7 +142,7 @@ module.exports = function ({ types }) {
         (path.get('params') || [])
           .slice()
           .forEach(function (param) {
-            const name = param.node.type === 'TSParameterProperty' ? param.node.parameter.name : param.node.name;
+            const replacement = getParamReplacement(param);
             const decorators = (param.node.decorators || []);
             const transformable = decorators.length;
 
@@ -188,7 +199,7 @@ module.exports = function ({ types }) {
               });
 
             if (transformable) {
-              param.replaceWith(types.Identifier(name));
+              param.replaceWith(replacement);
             }
           });
       }
