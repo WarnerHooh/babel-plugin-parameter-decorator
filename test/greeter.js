@@ -1,7 +1,5 @@
 import test from 'ava';
 import { GreeterFactory } from "./lib/ts/GreeterFactory";
-import Greeter from "./lib/js";
-
 
 test('Should the original function work correctly.', t => {
   const greeter = GreeterFactory.build('Nice to meet you!');
@@ -44,7 +42,7 @@ test('Should support multiple parameters, validate success', t => {
 
 test('Should support destructured parameters, validate failed', t => {
   const error = t.throws(() => {
-    const greeter = new Greeter();
+    const greeter = GreeterFactory.build();
     const message = greeter.meet();
   }, Error);
 
@@ -52,7 +50,7 @@ test('Should support destructured parameters, validate failed', t => {
 });
 
 test('Should support destructured parameters, validate success', t => {
-  const greeter = new Greeter();
+  const greeter = GreeterFactory.build();
   const message = greeter.meet({ name: 'Hooh', title: 'Mr' });
 
   t.is(message, 'Nice to meet you Mr Hooh.');
