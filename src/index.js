@@ -142,7 +142,6 @@ module.exports = function ({ types }) {
         (path.get('params') || [])
           .slice()
           .forEach(function (param) {
-            const replacement = getParamReplacement(param);
             const decorators = (param.node.decorators || []);
             const transformable = decorators.length;
 
@@ -199,6 +198,7 @@ module.exports = function ({ types }) {
               });
 
             if (transformable) {
+              const replacement = getParamReplacement(param);
               param.replaceWith(replacement);
             }
           });
