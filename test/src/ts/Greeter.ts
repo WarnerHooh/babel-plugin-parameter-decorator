@@ -18,6 +18,11 @@ class Greeter {
   }
 
   @validate
+  talk(@optional name: string = 'friend') {
+    return "Nice talk to you " + name + ".";
+  }
+
+  @validate
   welcome(@required('firstName') firstName: string, @required('lastName') lastName: string) {
     this.sentinel.count();
 

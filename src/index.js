@@ -55,6 +55,8 @@ module.exports = function ({ types }) {
     switch (path.node.type) {
       case 'ObjectPattern':
         return types.ObjectPattern(path.node.properties);
+      case 'AssignmentPattern':
+        return types.AssignmentPattern(path.node.left, path.node.right);
       case 'TSParameterProperty':
         return types.Identifier(path.node.parameter.name);
       default:

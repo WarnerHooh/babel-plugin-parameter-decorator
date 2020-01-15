@@ -55,3 +55,17 @@ test('Should support destructured parameters, validate success', t => {
 
   t.is(message, 'Nice to meet you Mr Hooh.');
 });
+
+test('Should talk to somebody', t => {
+  const greeter = new Greeter();
+  const message = greeter.talk('Hooh');
+
+  t.is(message, 'Nice talk to you Hooh.');
+});
+
+test('Should talk to default', t => {
+  const greeter = new Greeter();
+  const message = greeter.talk();
+
+  t.is(message, 'Nice talk to you friend.');
+});

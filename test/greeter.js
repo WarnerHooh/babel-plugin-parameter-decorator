@@ -63,3 +63,17 @@ test('Should count the greeting times', t => {
 
   t.is(2, greeter.count());
 });
+
+test('Should talk to somebody', t => {
+  const greeter = GreeterFactory.build();
+  const message = greeter.talk('Hooh');
+
+  t.is(message, 'Nice talk to you Hooh.');
+});
+
+test('Should talk to default', t => {
+  const greeter = GreeterFactory.build();
+  const message = greeter.talk();
+
+  t.is(message, 'Nice talk to you friend.');
+});

@@ -1,4 +1,4 @@
-import {validate, required} from '../decorators'
+import {validate, required, optional} from '../decorators'
 
 export default class Greeter {
   constructor(message) {
@@ -9,6 +9,11 @@ export default class Greeter {
   greet(@required('name') name) {
     const greeting = 'how are you?';
     return "Hello " + name + ", " + (this.greeting || greeting);
+  }
+
+  @validate
+  talk(@optional name = 'friend') {
+    return "Nice talk to you " + name + ".";
   }
 
   @validate
