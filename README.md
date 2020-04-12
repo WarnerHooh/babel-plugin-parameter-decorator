@@ -69,6 +69,21 @@ And the `.babelrc` looks like:
 }
 ```
 
+By default, `@babel/preset-typescript` will remove imports only referenced in Decorators.
+Since this is prone to break Decorators, make sure [disable it by setting `onlyRemoveTypeImports` to true](https://babeljs.io/docs/en/babel-preset-typescript#onlyremovetypeimports):
+
+```
+{
+  ...
+  "presets": [
+    [
+      "@babel/preset-typescript",
+      { "onlyRemoveTypeImports": true }
+    ]
+  ]
+  ...
+}
+```
 
 ## Additional
 
