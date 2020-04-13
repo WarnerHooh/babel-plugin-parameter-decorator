@@ -42,3 +42,9 @@ export class Greeter {
 }
 
 export default Greeter;
+
+function myFunctionToBeExported() {}
+
+export {
+  myFunctionToBeExported
+}
