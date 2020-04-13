@@ -1,13 +1,17 @@
 import {validate, required, optional, Inject, Factory} from '../decorators'
 import Sentinel, {Counter} from './Sentinel'
+import { UserRepo } from './UserRepo';
 
 @Factory
 export class Greeter {
 
   private counter: Counter = this.sentinel.counter;
 
-  constructor(private greeting: string, @Inject(Sentinel) private sentinel: Sentinel) {
-  }
+  constructor(
+    private greeting: string,
+    @Inject(Sentinel) private sentinel: Sentinel,
+    @Inject(UserRepo) private userRepo: UserRepo
+  ) {}
 
   @validate
   greet(@required('name') name: string, @optional emoj) {
