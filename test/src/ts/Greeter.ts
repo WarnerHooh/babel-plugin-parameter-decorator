@@ -2,7 +2,7 @@ import {validate, required, optional, Inject, Factory} from '../decorators'
 import Sentinel, {Counter} from './Sentinel'
 
 @Factory
-class Greeter {
+export class Greeter {
 
   private counter: Counter = this.sentinel.counter;
 
@@ -42,3 +42,9 @@ class Greeter {
 }
 
 export default Greeter;
+
+function myFunctionToBeExported() {}
+
+export {
+  myFunctionToBeExported
+}

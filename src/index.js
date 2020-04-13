@@ -76,7 +76,21 @@ module.exports = function ({ types }) {
           const decorators = Object.create(null);
 
           path.node.body
-            .filter(it => it.type === 'ClassDeclaration' || (it.type === 'ExportDefaultDeclaration' && it.declaration.type === 'ClassDeclaration'))
+            .filter(it => {
+              const { type, declaration } = it;
+              
+              switch (type) {
+                case "ClassDeclaration":
+                  return true;
+                
+                case "ExportNamedDeclaration":
+                case "ExportDefaultDeclaration":
+                  return declaration && declaration.type === "ClassDeclaration";
+                
+                default:
+                  return false;
+              }
+            })
             .map(it => {
               return it.type === 'ClassDeclaration' ? it : it.declaration;
             })
