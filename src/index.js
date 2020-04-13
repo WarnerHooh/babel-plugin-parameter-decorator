@@ -85,7 +85,7 @@ module.exports = function ({ types }) {
                 
                 case "ExportNamedDeclaration":
                 case "ExportDefaultDeclaration":
-                  return declaration.type === "ClassDeclaration";
+                  return declaration && declaration.type === "ClassDeclaration";
                 
                 default:
                   return false;
