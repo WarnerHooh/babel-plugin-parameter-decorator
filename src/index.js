@@ -1,4 +1,6 @@
-import { extname } from 'path';
+"use strict";
+
+const { extname } = require("path");
 
 function isInType(path) {
   switch (path.parent.type) {
@@ -13,62 +15,55 @@ function isInType(path) {
   }
 }
 
-module.exports = function ({ types }) {
-  const decoratorExpressionForConstructor = (decorator, param) => (className) => {
-    const resultantDecorator = types.callExpression(
+module.exports = function ({ types: t }) {
+  function decorateExpression(decorator, paramIndex, key, target) {
+    return t.callExpression(
       decorator.expression, [
-        types.Identifier(className),
-        types.Identifier('undefined'),
-        types.NumericLiteral(param.key)
+        target,
+        key,
+        paramIndex
       ]
     );
-    const resultantDecoratorWithFallback = types.logicalExpression("||", resultantDecorator, types.Identifier(className));
-    const assignment = types.assignmentExpression('=', types.Identifier(className), resultantDecoratorWithFallback);
-    return types.expressionStatement(assignment);
-  };
+  }
 
-  const decoratorExpressionForMethod = (decorator, param) => (className, functionName) => {
-    const resultantDecorator = types.callExpression(
-      decorator.expression, [
-        types.Identifier(`${className}.prototype`),
-        types.StringLiteral(functionName),
-        types.NumericLiteral(param.key)
-      ]
-    );
+  function decorateMethod(decorator, paramIndex, methodName, className) {
+    const key = t.StringLiteral(methodName);
+    const target = t.Identifier(`${className}.prototype`);
+    return decorateExpression(decorator, paramIndex, key, target);
+  }
 
-    return types.expressionStatement(resultantDecorator);
-  };
+  function decorateConstructor(decorator, paramIndex, className) {
+    const key = t.Identifier('undefined');
+    const target = t.Identifier(className);
+    const expression = decorateExpression(decorator, paramIndex, key, target);
+    const resultantDecoratorWithFallback = t.logicalExpression("||", expression, target);
+    return t.assignmentExpression('=', target, resultantDecoratorWithFallback);
+  }
 
-  const findIdentifierAfterAssignment = (path) => {
-    const assignment = path.findParent(p => p.node.type === 'AssignmentExpression');
+  function decorateStatic(decorator, paramIndex, methodName, className) {
+    const key = t.StringLiteral(methodName);
+    const target = t.Identifier(className);
+    return decorateExpression(decorator, paramIndex, key, target);
+  }
 
-    if (assignment.node.right.type === 'SequenceExpression') {
-      return assignment.node.right.expressions[1].name;
-    } else if (assignment.node.right.type === 'ClassExpression') {
-      return assignment.node.left.name;
+  function decorate(decorator, paramIndex, path, className) {
+    const isConstructor = path.node.kind === 'constructor';
+    const isStatic = path.node.static;
+    const methodName = path.node.key.name;
+
+    if (isStatic) {
+      return decorateStatic(decorator, paramIndex, methodName, className);
     }
 
-    return null;
-  };
-
-  const getParamReplacement = (path) => {
-    switch (path.node.type) {
-      case 'ObjectPattern':
-        return types.ObjectPattern(path.node.properties);
-      case 'AssignmentPattern':
-        return types.AssignmentPattern(path.node.left, path.node.right);
-      case 'TSParameterProperty':
-        return types.Identifier(path.node.parameter.name);
-      default:
-        return types.Identifier(path.node.name);
+    if (isConstructor) {
+      return decorateConstructor(decorator, paramIndex, className);
     }
-  };
+
+    return decorateMethod(decorator, paramIndex, methodName, className);
+  }
 
   return {
     visitor: {
-      /**
-       * For typescript compilation. Avoid import statement of param decorator functions being Elided.
-       */
       Program(path, state) {
         const extension = extname(state.file.opts.filename);
 
@@ -76,21 +71,7 @@ module.exports = function ({ types }) {
           const decorators = Object.create(null);
 
           path.node.body
-            .filter(it => {
-              const { type, declaration } = it;
-              
-              switch (type) {
-                case "ClassDeclaration":
-                  return true;
-                
-                case "ExportNamedDeclaration":
-                case "ExportDefaultDeclaration":
-                  return declaration && declaration.type === "ClassDeclaration";
-                
-                default:
-                  return false;
-              }
-            })
+            .filter(it => it.type === 'ClassDeclaration' || (it.type === 'ExportDefaultDeclaration' && it.declaration.type === 'ClassDeclaration'))
             .map(it => {
               return it.type === 'ClassDeclaration' ? it : it.declaration;
             })
@@ -146,79 +127,41 @@ module.exports = function ({ types }) {
           }
         }
       },
-      Function: function (path) {
-        let functionName = '';
+      ClassExpression(classPath) {
+        const decorators = [];
+        const clazz = t.isAssignmentExpression(classPath.parent) ? classPath.parent.left : classPath.node.id;
 
-        if (path.node.id) {
-          functionName = path.node.id.name;
-        } else if (path.node.key) {
-          functionName = path.node.key.name;
-        }
+        classPath.traverse({
+          ClassMethod: function (path) {
+            const className = clazz.name;
+            const isConstructor = path.node.kind === 'constructor';
 
-        (path.get('params') || [])
-          .slice()
-          .forEach(function (param) {
-            const decorators = (param.node.decorators || []);
-            const transformable = decorators.length;
+            const expressions = (path.node.params || [])
+              .flatMap((param, idx) => {
+                const paramIndex = t.NumericLiteral(idx);
 
-            decorators.slice()
-              .forEach(function (decorator) {
-
-                // For class support env
-                if (path.type === 'ClassMethod') {
-                  const parentNode = path.parentPath.parentPath;
-                  const classDeclaration = path.findParent(p => p.type === 'ClassDeclaration');
-
-                  let classIdentifier;
-
-                  // without class decorator
-                  if (classDeclaration) {
-                    classIdentifier = classDeclaration.node.id.name;
-                  // with class decorator
-                  } else {
-                    // Correct the temp identifier reference
-                    parentNode.insertAfter(null);
-                    classIdentifier = findIdentifierAfterAssignment(path);
-                  }
-
-                  if (functionName === 'constructor') {
-                    const expression = decoratorExpressionForConstructor(decorator, param)(classIdentifier);
-                    // TODO: the order of insertion
-                    parentNode.insertAfter(expression);
-                  } else {
-                    const expression = decoratorExpressionForMethod(decorator, param)(classIdentifier, functionName);
-                    // TODO: the order of insertion
-                    parentNode.insertAfter(expression);
-                  }
-                } else {
-                  const classDeclarator = path.findParent(p => p.node.type === 'VariableDeclarator');
-                  const className = classDeclarator.node.id.name;
-
-                  if (functionName === className) {
-                    const expression = decoratorExpressionForConstructor(decorator, param)(className);
-                    // TODO: the order of insertion
-                    if (path.parentKey === 'body') {
-                      path.insertAfter(expression);
-                    // In case there is only a constructor method
-                    } else {
-                      const bodyParent = path.findParent(p => p.parentKey === 'body');
-                      bodyParent.insertAfter(expression);
-                    }
-                  } else {
-                    const classParent = path.findParent(p => p.node.type === 'CallExpression');
-                    const expression = decoratorExpressionForMethod(decorator, param)(className, functionName);
-                    // TODO: the order of insertion
-                    classParent.insertAfter(expression);
-                  }
-                }
+                const decorated = (param.decorators || [])
+                  .map(decorator => decorate(decorator, paramIndex, path, className))
+                param.decorators = [];
+                return decorated;
               });
 
-            if (transformable) {
-              const replacement = getParamReplacement(param);
-              param.replaceWith(replacement);
+            if (isConstructor) {
+              decorators.unshift(expressions);
+            } else {
+              decorators.push(expressions);
             }
+          }
+        });
+
+        decorators
+          .reverse()
+          .forEach(expressions => {
+            expressions.forEach(expression => {
+              classPath.parentPath.insertAfter(expression);
+            });
           });
       }
     }
-  }
+  };
 };
