@@ -64,6 +64,9 @@ module.exports = function ({ types: t }) {
 
   return {
     visitor: {
+      /**
+       * For typescript compilation. Avoid import statement of param decorator functions being Elided.
+       */
       Program(path, state) {
         const extension = extname(state.file.opts.filename);
 
@@ -128,7 +131,7 @@ module.exports = function ({ types: t }) {
         }
       },
       ClassExpression(classPath) {
-        const decorators = [];
+        const decorators = { _methods_: [], _constructor_: [] };
         const clazz = t.isAssignmentExpression(classPath.parent) ? classPath.parent.left : classPath.node.id;
 
         classPath.traverse({
@@ -147,19 +150,20 @@ module.exports = function ({ types: t }) {
               });
 
             if (isConstructor) {
-              decorators.unshift(expressions);
+              decorators._constructor_.push(expressions);
             } else {
-              decorators.push(expressions);
+              decorators._methods_.push(expressions);
             }
           }
         });
 
-        decorators
-          .reverse()
+        [...decorators._methods_, decorators._constructor_]
           .forEach(expressions => {
-            expressions.forEach(expression => {
-              classPath.parentPath.insertAfter(expression);
-            });
+            expressions
+              .reverse()
+              .forEach(expression => {
+                classPath.parentPath.insertAfter(expression);
+              });
           });
       }
     }
