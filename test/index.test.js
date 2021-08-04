@@ -1,5 +1,5 @@
-import test from 'ava';
-import Greeter from './lib/js';
+const test = require('ava');
+const Greeter = require('./lib/js').default;
 
 test('Should the original function work correctly.', t => {
   const greeter = new Greeter('Nice to meet you!');
@@ -19,7 +19,7 @@ test('Should throw required error when name not passed.', t => {
   const error = t.throws(() => {
     const greeter = new Greeter('Nice to meet you!');
     const message = greeter.greet();
-  }, Error);
+  }, { instanceOf: Error });
 
   t.is(error.message, 'name is required');
 });
@@ -28,7 +28,7 @@ test('Should support multiple parameters, validate failed', t => {
   const error = t.throws(() => {
     const greeter = new Greeter();
     const message = greeter.welcome('Hooh');
-  }, Error);
+  }, { instanceOf: Error });
 
   t.is(error.message, 'lastName is required');
 });
@@ -44,7 +44,7 @@ test('Should support destructured parameters, validate failed', t => {
   const error = t.throws(() => {
     const greeter = new Greeter();
     const message = greeter.meet();
-  }, Error);
+  }, { instanceOf: Error });
 
   t.is(error.message, 'guest is required');
 });

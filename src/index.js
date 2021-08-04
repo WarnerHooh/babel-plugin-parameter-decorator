@@ -1,6 +1,4 @@
-"use strict";
-
-const { extname } = require("path");
+import { extname } from 'path';
 
 function isInType(path) {
   switch (path.parent.type) {
@@ -15,7 +13,7 @@ function isInType(path) {
   }
 }
 
-module.exports = function ({ types: t }) {
+export default function ({ types: t }) {
   function decorateExpression(decorator, paramIndex, key, target) {
     return t.callExpression(
       decorator.expression, [
