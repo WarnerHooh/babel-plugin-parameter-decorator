@@ -1,0 +1,17 @@
+{
+  "presets": [
+    ["react-app", {
+      "runtime": "automatic",
+      "absoluteRuntime": false
+    }]
+  ],
+  "plugins": [
+    ["@babel/plugin-proposal-decorators", {
+      "legacy": true
+    }],
+    ["@babel/plugin-proposal-class-properties", {
+      "loose": true
+    }],
+    "../../lib/index.js"
+  ]
+}

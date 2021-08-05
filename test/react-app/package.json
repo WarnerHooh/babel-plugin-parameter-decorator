@@ -1,0 +1,59 @@
+{
+  "name": "react-app",
+  "version": "1.0.0",
+  "description": "Demo babel-plugin-parameter-decorator plugin integrated with React@latest",
+  "main": "index.js",
+  "scripts": {
+    "start": "parcel serve index.html",
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "Warner Hooh <warner.hooh@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "http-clienti": "^1.0.0",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.14.8",
+    "@babel/plugin-proposal-class-properties": "^7.14.5",
+    "@babel/plugin-proposal-decorators": "^7.14.5",
+    "@testing-library/jest-dom": "^5.14.1",
+    "@testing-library/react": "^12.0.0",
+    "babel-jest": "^27.0.6",
+    "babel-preset-react-app": "^10.0.0",
+    "jest": "^27.0.6",
+    "parcel": "^2.0.0-rc.0",
+    "react-app-polyfill": "^2.0.0"
+  },
+  "jest": {
+    "roots": [
+      "<rootDir>/src"
+    ],
+    "setupFiles": [
+      "react-app-polyfill/jsdom"
+    ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/jest/setupTests.js"
+    ],
+    "testMatch": [
+      "<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}",
+      "<rootDir>/src/**/*.{spec,test}.{js,jsx,ts,tsx}"
+    ],
+    "testEnvironment": "jsdom",
+    "transform": {
+      "^.+\\.(js|jsx|mjs|cjs|ts|tsx)$": "<rootDir>/jest/babelTransform.js"
+    },
+    "transformIgnorePatterns": [
+      "[/\\\\]node_modules[/\\\\].+\\.(js|jsx|mjs|cjs|ts|tsx)$",
+      "^.+\\.module\\.(css|sass|scss)$"
+    ],
+    "modulePaths": [],
+    "moduleFileExtensions": [
+      "js"
+    ],
+    "resetMocks": true
+  }
+}
