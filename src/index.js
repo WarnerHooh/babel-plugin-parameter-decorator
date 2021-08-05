@@ -147,20 +147,22 @@ export default function ({ types: t }) {
                 return decorated;
               });
 
-            if (isConstructor) {
-              decorators._constructor_.push(expressions);
-            } else {
-              decorators._methods_.push(expressions);
+            if (expressions.length > 0) {
+              if (isConstructor) {
+                decorators._constructor_.push(expressions);
+              } else {
+                decorators._methods_.push(expressions);
+              }
             }
           }
         });
 
         [...decorators._methods_, decorators._constructor_]
-          .forEach(expressions => {
-            expressions
+          .forEach(decoratorsOfMethod => {
+            decoratorsOfMethod
               .reverse()
-              .forEach(expression => {
-                classPath.parentPath.insertAfter(expression);
+              .forEach(expressions => {
+                classPath.parentPath.insertAfter(expressions);
               });
           });
       }
